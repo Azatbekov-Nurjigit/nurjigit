@@ -1,24 +1,24 @@
 from django.urls import path
-from movieapp.views import *
+from movieapp.views import director_list_view, movie_list_view, review_list_view, director_detail_view, movie_detail_view, \
+    review_detail_view, rating
+
 
 urlpatterns =[
-    # path('api/v1/directors/<int:id>/', directorr),
-    # path('api/v1/movies/<int:id>/', moviee),
-    # path('api/v1/reviews/<int:id>/', Revieww),
-    path('api/v1/directors/', directorrr),
-    path('api/v1/movies/', movieee),
-    path('api/v1/reviews/', Reviewww),
-    # path('/api/v1/movies/reviews/', rating),
+    path('api/v1/directors/<int:id>/', director_detail_view),
+    path('api/v1/movies/<int:id>/', movie_detail_view),
+    path('api/v1/reviews/<int:id>/', review_detail_view),
+    path('api/v1/directors/', director_list_view),
+    path('api/v1/movies/', movie_list_view),
+    path('api/v1/reviews/', review_list_view),
+    path('api/v1/movies/reviews/', rating)
 ]
 
-# Домашнее задание 2.
-# Добавить к модели Review новое поле stars, в котором будет храниться значение
-# от 1 до 5. stars поле в себе хранит рейтинг отзыва.
-# Вывести на страницу список фильмов с их отзывами(reviews) -  /api/v1/movies/reviews/. а также
-# вывести средний балл всех отзывов (rating)
-# Вывести режиссеров /api/v1/directors/ с количеством фильмов (movies_count)
-
-
-
+# Домашнее задание 3.
+# Добавить создание режиссеров              /api/v1/directors/
+# Добавить изменение и удаление режиссера   /api/v1/directors/<int:id>/
+# Добавить создание фильмов                 /api/v1/movies/
+# Добавить изменение и удаление фильм       /api/v1/movies/<int:id>/
+# Добавить создание отзывов                 /api/v1/reviews/
+# Добавить изменение и удаление отзыва      /api/v1/reviews/<int:id>/
 
 

@@ -1,36 +1,57 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-class Name(models.Model):
-    name = models.TextField()
+class Director(models.Model):
+    name = models.CharField(max_length=255)
 
-class Coment(models.Model):
-    text = models.TextField()
+    def __str__(self):
+        return self.name
 
-class Stars(models.Model):
-    stars = models.DecimalField(max_digits=5, decimal_places=1)
+    def movie_count(self):
+        return self.movies.all().count()
 
 class Movie(models.Model):
-    title = models.ForeignKey(Name, on_delete=models.CASCADE)
+    title = models.CharField(max_length=250)
     description = models.TextField()
-    duration_min = models.PositiveIntegerField(null=True)
-    director = models.CharField(max_length=250)
+    duration = models.PositiveIntegerField()
+    director = models.ForeignKey(Director, on_delete=models.CASCADE, related_name='movies')
+
+    def __str__(self):
+        return self.title
+
+    def rating(self):
+        lists = [review.stars for review in self.reviews.all()]
+        answer = sum(lists) / len(lists)
+        return answer
+
+
+STARS = (
+    (1, '*'),
+    (2, '* *'),
+    (3, '* * *'),
+    (4, '* * * *'),
+    (5, '* * * * *')
+)
 
 class Review(models.Model):
-    text = models.ForeignKey(Coment, on_delete=models.CASCADE)
-    movie = models.CharField(max_length=250)
-    stars = models.ForeignKey(Stars, on_delete=models.CASCADE)
+    text = models.TextField()
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews')
+    stars = models.IntegerField()
 
 
-# Домашнее задание 2.
-# Добавить к модели Review новое поле stars, в котором будет храниться значение
-# от 1 до 5. stars поле в себе хранит рейтинг отзыва.
-# Вывести на страницу список фильмов с их отзывами(reviews) -  /api/v1/movies/reviews/. а также
-# вывести средний балл всех отзывов (rating)
-# Вывести режиссеров /api/v1/directors/ с количеством фильмов (movies_count)
+    def __str__(self):
+        return self.text
 
-    # category = models.ForeignKey(Category, on_delete=models.CASCADE,
-    #                              null=True)
+    def stars_str(self):
+        return self.stars * '* '
 
-    # post = models.ForeignKey(Post, on_delete=models.CASCADE,
-    #                          related_name='comments')
 
+
+
+# Домашнее задание 3.
+# Добавить создание режиссеров              /api/v1/directors/
+# Добавить изменение и удаление режиссера   /api/v1/directors/<int:id>/
+# Добавить создание фильмов                 /api/v1/movies/
+# Добавить изменение и удаление фильм       /api/v1/movies/<int:id>/
+# Добавить создание отзывов                 /api/v1/reviews/
+# Добавить изменение и удаление отзыва      /api/v1/reviews/<int:id>/
