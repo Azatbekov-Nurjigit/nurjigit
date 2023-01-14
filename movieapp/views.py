@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -11,8 +12,9 @@ def director_list_view(request):
         serializer = DirectorSerializer(directs, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK,)
     elif request.method == 'POST':
-        name = request.data.get('name')
-        directs = Director.objects.create(name=name,)
+        serializer = DirectorValidateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        directs = serializer.validated_data.get("name")
         directs.save()
         return Response(data={'message': 'data received!', 'post': DirectorSerializer(directs).data})
 
@@ -24,10 +26,14 @@ def movie_list_view(request):
         serializer = MovieSerializer(directs, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        title = request.data.get('title')
-        description = request.data.get('description')
-        duration = request.data.get('duration')
-        director = request.data.get('director')
+        serializer = MovieValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE,
+                            data={'errors': serializer.errors})
+        title = serializer.validated_data.get("title")
+        description = serializer.validated_data.get("description")
+        duration = serializer.validated_data.get("duration")
+        director = serializer.validated_data.get("director")
         directs = Director.objects.create(title=title, description=description, duration=duration, director=director)
         directs.save()
         return Response(data={'message': 'data received!', 'post': MovieSerializer(directs).data})
@@ -45,12 +51,17 @@ def review_list_view(request):
         serializer = ReviewSerializer(directs, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        text = request.data.get('text')
-        movie = request.data.get('movie')
-        stars = request.data.get('stars')
-        directs = Director.objects.create(text=text, stars=stars, movie=movie)
-        directs.save()
-        return Response(data={'message': 'data received!', 'post': ReviewSerializer(directs).data})
+        serializer = ReviewValidateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        text = serializer.validated_data.get("text")
+        stars = serializer.validated_data.get("stars")
+        movie = serializer.validated_data.get("movie")
+        with transaction.atomic():
+            reviews = Review.objects.create(text=text, stars=stars, movie_id=movie)
+            reviews.save()
+            return Response(data={"massage": "Review created successfully!",
+                                  "reviews": ReviewSerializer(reviews).data},
+                            status=status.HTTP_201_CREATED)
 
 
 
@@ -76,7 +87,9 @@ def director_detail_view(request, **kwargs):
         directs.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     else:
-        directs.title = request.data.get('name')
+        serializer = DirectorValidateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        directs.name = serializer.validated_data.get("name")
         directs.save()
         return Response(data={'message': 'data received!', 'post': DirectorSerializer(directs).data})
 
@@ -98,10 +111,12 @@ def movie_detail_view(request, **kwargs):
         directs.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     else:
-        directs.title = request.data.get('title')
-        directs.description = request.data.get('description')
-        directs.duration = request.data.get('duration')
-        directs.tags.set(request.data.get('tags'))
+        serializer = MovieValidateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        directs.title = serializer.validated_data.get("title")
+        directs.description = serializer.validated_data.get("description")
+        directs.duration = serializer.validated_data.get("duration")
+        directs.director_id = serializer.validated_data.get("director")
         directs.save()
         return Response(data={'message': 'data received!', 'post': MovieSerializer(directs).data})
 
@@ -124,8 +139,11 @@ def review_detail_view(request, **kwargs):
         directs.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     else:
-        directs.text = request.data.get('text')
-        directs.stars = request.data.get('stars')
+        serializer = ReviewValidateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        directs.text = serializer.validated_data.get("text")
+        directs.stars = serializer.validated_data.get("stars")
+        directs.movie_id = serializer.validated_data.get("movie")
         directs.save()
         return Response(data={'message': 'data received!', 'post': ReviewSerializer(directs).data})
 
@@ -143,13 +161,6 @@ def rating(request):
     return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-# Домашнее задание 3.
-# Добавить создание режиссеров              /api/v1/directors/
-# Добавить изменение и удаление режиссера   /api/v1/directors/<int:id>/
-# Добавить создание фильмов                 /api/v1/movies/
-# Добавить изменение и удаление фильм       /api/v1/movies/<int:id>/
-# Добавить создание отзывов                 /api/v1/reviews/
-# Добавить изменение и удаление отзыва      /api/v1/reviews/<int:id>/
 
 
 
