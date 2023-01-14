@@ -8,7 +8,6 @@ admin.site.register(Review)
 
 
 
-# jojo 123456
 
 
 

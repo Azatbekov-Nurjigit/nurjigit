@@ -7,8 +7,13 @@ class Director(models.Model):
     def __str__(self):
         return self.name
 
+    @property
     def movie_count(self):
         return self.movies.all().count()
+
+
+
+
 
 class Movie(models.Model):
     title = models.CharField(max_length=250)
@@ -19,10 +24,11 @@ class Movie(models.Model):
     def __str__(self):
         return self.title
 
+    @property
     def rating(self):
         lists = [review.stars for review in self.reviews.all()]
-        answer = sum(lists) / len(lists)
-        return answer
+        return sum(lists) / len(lists) if len(lists) != 0 else "error"
+
 
 
 STARS = (
@@ -42,6 +48,7 @@ class Review(models.Model):
     def __str__(self):
         return self.text
 
+    @property
     def stars_str(self):
         return self.stars * '* '
 
