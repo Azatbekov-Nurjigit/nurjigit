@@ -165,11 +165,5 @@ def rating(request):
     return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-# Домашнее задание 4.
-# Написать валидацию на все API
-# /api/v1/directors/
-# /api/v1/directors/<int:id>/
-# /api/v1/movies/
-# /api/v1/movies/<int:id>/
-# /api/v1/reviews/
-# /api/v1/reviews/<int:id>/
+
+
