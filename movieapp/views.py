@@ -1,7 +1,8 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from movieapp.serializer import *
+from movieapp.serializer import ReviewSerializer, DirectorValidateSerializer, MovieValidateSerializer, ReviewValidateSerializer
+
 from movieapp.models import Director, Movie, Review
 from django.db import transaction
 
@@ -172,11 +173,3 @@ def rating(request):
 # /api/v1/movies/<int:id>/
 # /api/v1/reviews/
 # /api/v1/reviews/<int:id>/
-
-
-
-
-
-
-
-
