@@ -1,16 +1,18 @@
 from django.urls import path
-from movieapp.views import director_list_view, movie_list_view, review_list_view, director_detail_view, movie_detail_view, \
-    review_detail_view, rating
+from .views import *
+# from movieapp.views import director_list_view, movie_list_view, review_list_view, director_detail_view, movie_detail_view, \
+#     review_detail_view, rating
+LIST_CREATE = {'get': 'list', 'post': 'create'}
+RETRIEVE_UPDATE_DESTROY = {'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}
 
 
 urlpatterns =[
-    path('api/v1/directors/<int:id>/', director_detail_view),
-    path('api/v1/movies/<int:id>/', movie_detail_view),
-    path('api/v1/reviews/<int:id>/', review_detail_view),
-    path('api/v1/directors/', director_list_view),
-    path('api/v1/movies/', movie_list_view),
-    path('api/v1/reviews/', review_list_view),
-    path('api/v1/movies/reviews/', rating)
+    path('directors/', DirectorModelViewSet.as_view(LIST_CREATE)),
+    path('directors/<int:id>/', DirectorModelViewSet.as_view(RETRIEVE_UPDATE_DESTROY)),
+    path('movies/', MovieModelViewSet.as_view(LIST_CREATE)),
+    path('movies/<int:id>/', MovieModelViewSet.as_view(RETRIEVE_UPDATE_DESTROY)),
+    path('reviews/', ReviewModelViewSet.as_view(LIST_CREATE)),
+    path('reviews/<int:id>/', ReviewModelViewSet.as_view(RETRIEVE_UPDATE_DESTROY)),
 ]
 
 
